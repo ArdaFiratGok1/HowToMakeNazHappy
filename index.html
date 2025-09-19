@@ -84,7 +84,7 @@
     const failCountEl=document.getElementById('failCount');
     const streakEl=document.getElementById('streak');
 
-    function moodImagePath(){const key=MOODS[state.moodIndex].key;return `/images/${state.name}/${key}.jpg`;}
+    function moodImagePath(){const key=MOODS[state.moodIndex].key;return `/images/${key}.jpg`;}
     function renderMood(){document.body.setAttribute('data-mood',MOODS[state.moodIndex].key);avatarEl.innerHTML='';const img=new Image();img.src=moodImagePath();img.alt=state.name;img.onload=()=>{avatarEl.appendChild(img)};img.onerror=()=>{avatarEl.innerHTML=`<span>${MOODS[state.moodIndex].emoji}</span>`};moodLabelEl.textContent=MOODS[state.moodIndex].label;}
 
     function setDifficultyByStreak(){const s=state.streak;state.difficulty=s>=8?3:s>=3?2:1;}
