@@ -10,11 +10,13 @@
       --good:#10b981; --bad:#ef4444; --accent:#3b82f6;
     }
     body{margin:0;font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu;transition:background .35s ease}
-    body[data-mood="sad1"]{background:#1a0e16;}
-    body[data-mood="sad1"]{background:#162032;}
-    body[data-mood="neutral"]{background:#f6f8ff;}
-    body[data-mood="mutlu1"]{background:#ecfff6;}
-    body[data-mood="mutlu2"]{background:#fff7e0;}
+    body[data-mood="sad3"]{background:#1a0e16;} /* En üzgün - En koyu */
+    body[data-mood="sad2"]{background:#162032;} /* Çok üzgün */
+    body[data-mood="sad1"]{background:#41485f;} /* Üzgün - Ara ton */
+    body[data-mood="neutral"]{background:#f6f8ff;} /* Nötr */
+    body[data-mood="mutlu1"]{background:#ecfff6;} /* Mutlu */
+    body[data-mood="mutlu2"]{background:#fff7e0;} /* Çok mutlu */
+    body[data-mood="mutlu3"]{background:#fff0c7;} /* En mutlu - En parlak */
 
     .wrap{min-height:100dvh;display:grid;grid-template-columns:320px 1fr}
     aside{background:var(--panel);border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:20px}
@@ -72,7 +74,7 @@
       {key:'mutlu2',label:'Çok mutlu',emoji:'😄'},
       {key:'mutlu3',label:'Çok mutlu',emoji:'😄'}
     ];
-    const state={name:'Naz',moodIndex:2,ok:0,fail:0,streak:0,difficulty:1,current:null};
+    const state={name:'Naz',moodIndex:3,ok:0,fail:0,streak:0,difficulty:1,current:null};
 
     let audioCtx;function beep(type='good'){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);const good=type==='good';o.type=good?'triangle':'square';o.frequency.value=good?880:240;g.gain.value=.0001;const t=audioCtx.currentTime;g.gain.exponentialRampToValueAtTime(good?.12:.08,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+.25);o.start();o.stop(t+.26)}catch(e){}}
 
