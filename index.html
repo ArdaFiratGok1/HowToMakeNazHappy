@@ -88,6 +88,13 @@
 
     function moodImagePath(){const key=MOODS[state.moodIndex].key;return `images/${key}.jpg`;}
 
+    function preloadImages() {
+      console.log('Tüm ruh hali görüntüleri önceden yükleniyor...');
+      MOODS.forEach(mood => {
+      const img = new Image();
+      img.src = `images/${mood.key}.jpg`;
+      });
+    }
     function renderMood(){
       document.body.setAttribute('data-mood',MOODS[state.moodIndex].key);
       avatarEl.innerHTML='';
@@ -108,7 +115,7 @@
     submitBtn.addEventListener('click',handleSubmit);
     skipBtn.addEventListener('click',()=>newQuestion());
     answerInput.addEventListener('keydown',e=>{if(e.key==='Enter')handleSubmit()});
-    
+    preloadImages();
     renderMood();
     newQuestion();
   </script>
