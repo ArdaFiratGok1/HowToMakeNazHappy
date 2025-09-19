@@ -40,6 +40,37 @@
     .stats strong{color:#111}
 
     @media(max-width:768px){.wrap{grid-template-columns:1fr;grid-template-rows:auto 1fr}aside{border-right:none;border-bottom:1px solid var(--border)}}
+    .avatar-jump {
+  animation: jump 0.6s ease-out;
+}
+
+.avatar-shake {
+  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97);
+}
+
+@keyframes jump {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-30px);
+  }
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translateX(-2px);
+  }
+  20%, 80% {
+    transform: translateX(4px);
+  }
+  30%, 50%, 70% {
+    transform: translateX(-6px);
+  }
+  40%, 60% {
+    transform: translateX(6px);
+  }
+}
   </style>
 </head>
 <body data-mood="neutral">
@@ -69,7 +100,7 @@
       {key:'sad3',label:'Naz birazdan kalkıp birini s*kecek 😥😭',emoji:'😭'},
       {key:'sad2',label:'😡😡',emoji:'😡'},
       {key:'sad1',label:'yanlış??😒',emoji:'☹️'},
-      {key:'neutral',label:'Selam 🙂',emoji:'😐'},
+      {key:'neutral',label:'Selam soruları çözmemde yardımcı olur musun',emoji:'😐'},
       {key:'mutlu1',label:'Doğru Cevap!! ☺️',emoji:'🙂'},
       {key:'mutlu2',label:'YİNE DOĞRU CEVAP 😄 ',emoji:'😄'},
       {key:'mutlu3',label:'🥳🥳🥳',emoji:'😄'}
@@ -107,11 +138,54 @@
       img.onerror=()=>{avatarEl.innerHTML=`<span>${MOODS[state.moodIndex].emoji}</span>`};
       moodLabelEl.textContent=MOODS[state.moodIndex].label;
     }
+    // Bu yardımcı fonksiyonu da script'e ekleyin (örn: renderMood'un altına)
+function triggerAnimation(animationClass) {
+  avatarEl.classList.add(animationClass);
+  // Animasyon bitince sınıfı temizle ki tekrar tetiklenebilsin
+  avatarEl.addEventListener('animationend', () => {
+    avatarEl.classList.remove(animationClass);
+  }, { once: true });
+}
 
     function setDifficultyByStreak(){const s=state.streak;state.difficulty=s>=8?3:s>=3?2:1;}
     function rng(min,max){return Math.floor(Math.random()*(max-min+1))+min}
     function newQuestion(){setDifficultyByStreak();let range=state.difficulty===1?10:state.difficulty===2?25:60;let a=rng(0,range),b=rng(0,range);const op=Math.random()<.5?'+':'-';if(op==='-'&&b>a)[a,b]=[b,a];state.current={a,b,op,answer:op==='+'?a+b:a-b};questionEl.innerHTML=`<div>${a}</div><div>${op}</div><div>${b}</div><div>=</div>`;answerInput.value='';setTimeout(()=>answerInput.focus(),0)}
-    function applyResult(ok){if(ok){state.ok++;state.streak++;state.moodIndex=Math.min(MOODS.length-1,state.moodIndex+1);beep('good')}else{state.fail++;state.streak=0;state.moodIndex=Math.max(0,state.moodIndex-1);beep('bad')}okCountEl.textContent=state.ok;failCountEl.textContent=state.fail;streakEl.textContent=state.streak;renderMood()}
+    
+    function applyResult(ok) {
+  const moodBefore = state.moodIndex; // Ruh hali değişmeden önceki indeksi al
+  const maxMoodIndex = MOODS.length - 1;
+
+  // Normal skor ve ruh hali güncelleme mantığı
+  if (ok) {
+    state.ok++;
+    state.streak++;
+    state.moodIndex = Math.min(maxMoodIndex, state.moodIndex + 1);
+    beep('good');
+  } else {
+    state.fail++;
+    state.streak = 0;
+    state.moodIndex = Math.max(0, state.moodIndex - 1);
+    beep('bad');
+  }
+
+  // Animasyonları kontrol et
+  if (ok && moodBefore === maxMoodIndex) {
+    // Zaten en mutluydun ve yine doğru bildin -> Zıpla!
+    triggerAnimation('avatar-jump');
+  } else if (!ok && moodBefore === 0) {
+    // Zaten en üzgündün ve yine yanlış bildin -> Titre!
+    triggerAnimation('avatar-shake');
+  }
+  
+  okCountEl.textContent = state.ok;
+  failCountEl.textContent = state.fail;
+  streakEl.textContent = state.streak;
+  renderMood();
+}
+
+
+
+
     function handleSubmit(){const val=Number((answerInput.value||'').trim());if(Number.isNaN(val)){answerInput.focus();return}const ok=(val===state.current.answer);answerInput.style.outline=`2px solid ${ok?'var(--good)':'var(--bad)'}`;setTimeout(()=>answerInput.style.outline='none',180);applyResult(ok);newQuestion()}
 
     submitBtn.addEventListener('click',handleSubmit);
