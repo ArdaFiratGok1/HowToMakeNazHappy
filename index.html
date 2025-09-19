@@ -172,7 +172,10 @@ const sounds = {
     const failCountEl=document.getElementById('failCount');
     const streakEl=document.getElementById('streak');
 
-    function moodImagePath(){const key=MOODS[state.moodIndex].key;return `images/${key}.jpg`;}
+    function moodImagePath(){
+  const key = MOODS[state.moodIndex].key;
+  return `images/${key}.jpg`;   // ← burası string
+}
 
     function preloadImages() {
       console.log('Tüm ruh hali görüntüleri önceden yükleniyor...');
