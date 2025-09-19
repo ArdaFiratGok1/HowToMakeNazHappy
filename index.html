@@ -157,7 +157,7 @@ const sounds = {
     wrong: new Audio('sounds/wrong_sound.mp3'),
     win: new Audio('sounds/win_sound.mp3'),
     lose: new Audio('sounds/lose_sound.mp3'),
-    neutral: new Audio('sounds/hmm_sound.mp3')
+    neutral: new Audio('sounds/hmmmm_sound.mp3')
 };
 
     let audioCtx;function beep(type='good'){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);const good=type==='good';o.type=good?'triangle':'square';o.frequency.value=good?880:240;g.gain.value=.0001;const t=audioCtx.currentTime;g.gain.exponentialRampToValueAtTime(good?0.12:.08,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+.25);o.start();o.stop(t+.26)}catch(e){}}
