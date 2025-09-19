@@ -194,6 +194,16 @@ const sounds = {
       img.onerror=()=>{avatarEl.innerHTML=`<span>${MOODS[state.moodIndex].emoji}</span>`};
       moodLabelEl.textContent=MOODS[state.moodIndex].label;
     }
+    function setupIntroSound(){
+  const playOnce = () => {
+    playSound('neutral');
+    document.removeEventListener('pointerdown', playOnce);
+    document.removeEventListener('keydown', playOnce);
+  };
+  // İlk tıklama/dokunma veya tuş basışında 1 kez çal
+  document.addEventListener('pointerdown', playOnce, { once: true });
+  document.addEventListener('keydown', playOnce, { once: true });
+}
     function playSound(soundKey) {
     try {
         const sound = sounds[soundKey];
@@ -309,7 +319,8 @@ document.addEventListener('DOMContentLoaded', () => {
   preloadImages();
   renderMood();
   newQuestion();      // Artık ilk soru yüklenir
-  playSound('neutral');
+  setupIntroSound();
+  //playSound('neutral');
 });
   </script>
 
