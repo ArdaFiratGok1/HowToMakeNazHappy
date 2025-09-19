@@ -1,100 +1,99 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>How To Make Naz Happy?</title>
-  <style>
-    :root{
-      --ink:#0f1322; --panel:#ffffff; --border:#e6e8f2;
-      --good:#10b981; --bad:#ef4444; --accent:#3b82f6;
-    }
-    body{margin:0;font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu;transition:background .35s ease}
-    body[data-mood="very_sad"]{background:#1a0e16;}
-    body[data-mood="sad"]{background:#162032;}
-    body[data-mood="neutral"]{background:#f6f8ff;}
-    body[data-mood="happy"]{background:#ecfff6;}
-    body[data-mood="very_happy"]{background:#fff7e0;}
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>How To Make Naz Happy?</title>
+<style>
+:root{
+--ink:#0f1322; --panel:#ffffff; --border:#e6e8f2;
+--good:#10b981; --bad:#ef4444; --accent:#3b82f6;
+}
+body{margin:0;font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu;transition:background .35s ease}
+body[data-mood="very_sad"]{background:#1a0e16;}
+body[data-mood="sad"]{background:#162032;}
+body[data-mood="neutral"]{background:#f6f8ff;}
+body[data-mood="happy"]{background:#ecfff6;}
+body[data-mood="very_happy"]{background:#fff7e0;}
 
-    .wrap{min-height:100dvh;display:grid;grid-template-columns:320px 1fr}
-    aside{background:var(--panel);border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:20px}
-    .avatar-large{width:100%;max-width:260px;border-radius:20px;overflow:hidden;display:grid;place-items:center;background:#f1f3fe;border:1px solid var(--border)}
-    .avatar-large img{width:100%;height:auto;object-fit:cover}
 
-    main{display:flex;align-items:center;justify-content:center;padding:28px}
-    .panel{width:min(600px,100%);background:var(--panel);border:1px solid var(--border);border-radius:16px;box-shadow:0 6px 18px rgba(0,0,0,.08);padding:24px;display:grid;gap:18px}
-    h1{margin:0;font-size:22px;text-align:center;color:var(--ink)}
-    .mood-label{text-align:center;font-size:14px;color:#555;margin-top:6px}
+.wrap{min-height:100dvh;display:grid;grid-template-columns:320px 1fr}
+aside{background:var(--panel);border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:20px}
+.avatar-large{width:100%;max-width:260px;border-radius:20px;overflow:hidden;display:grid;place-items:center;background:#f1f3fe;border:1px solid var(--border)}
+.avatar-large img{width:100%;height:auto;object-fit:cover}
+.avatar-large span{font-size:120px}
 
-    .question{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center;font-size:36px;font-weight:800;color:#111}
-    .answer{display:flex;justify-content:center}
-    .answer input{width:160px;font-size:28px;padding:10px 14px;border-radius:12px;border:1px solid var(--border)}
 
-    .actions{display:flex;gap:10px;justify-content:center}
-    .btn{border:1px solid var(--border);background:#111827;color:#fff;padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:600}
-    .btn.secondary{background:#f9fafb;color:#111}
+main{display:flex;align-items:center;justify-content:center;padding:28px}
+.panel{width:min(600px,100%);background:var(--panel);border:1px solid var(--border);border-radius:16px;box-shadow:0 6px 18px rgba(0,0,0,.08);padding:24px;display:grid;gap:18px}
+h1{margin:0;font-size:22px;text-align:center;color:var(--ink)}
+.mood-label{text-align:center;font-size:14px;color:#555;margin-top:6px}
 
-    .stats{text-align:center;color:#333}
-    .stats strong{color:#111}
 
-    @media(max-width:768px){.wrap{grid-template-columns:1fr;grid-template-rows:auto 1fr}aside{border-right:none;border-bottom:1px solid var(--border)}}
-  </style>
+.question{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center;font-size:36px;font-weight:800;color:#111}
+.answer{display:flex;justify-content:center}
+.answer input{width:160px;font-size:28px;padding:10px 14px;border-radius:12px;border:1px solid var(--border)}
+
+
+.actions{display:flex;gap:10px;justify-content:center}
+.btn{border:1px solid var(--border);background:#111827;color:#fff;padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:600}
+.btn.secondary{background:#f9fafb;color:#111}
+
+
+.stats{text-align:center;color:#333}
+.stats strong{color:#111}
+
+
+@media(max-width:768px){.wrap{grid-template-columns:1fr;grid-template-rows:auto 1fr}aside{border-right:none;border-bottom:1px solid var(--border)}}
+</style>
 </head>
 <body data-mood="neutral">
-  <div class="wrap">
-    <aside>
-      <div>
-        <div class="avatar-large" id="avatar"><span>😐</span></div>
-        <div class="mood-label" id="moodLabel">Neutral</div>
-      </div>
-    </aside>
-    <main>
-      <section class="panel">
-        <h1>How To Make Naz Happy?</h1>
-        <div class="question" id="question"></div>
-        <div class="answer"><input id="answerInput" inputmode="numeric" autocomplete="off" placeholder="cevap" /></div>
-        <div class="actions">
-          <button class="btn" id="submitBtn">Cevabı Kontrol Et</button>
-          <button class="btn secondary" id="skipBtn">Pas Geç</button>
-        </div>
-        <div class="stats">Doğru: <strong id="okCount">0</strong> · Yanlış: <strong id="failCount">0</strong> · Seri: <strong id="streak">0</strong></div>
-      </section>
-    </main>
-  </div>
+<div class="wrap">
+<aside>
+<div>
+<div class="avatar-large" id="avatar"><span>😐</span></div>
+<div class="mood-label" id="moodLabel">Neutral</div>
+</div>
+</aside>
+<main>
+<section class="panel">
+<h1>How To Make Naz Happy?</h1>
+<div class="question" id="question"></div>
+<div class="answer"><input id="answerInput" inputmode="numeric" autocomplete="off" placeholder="cevap" /></div>
+<div class="actions">
+<button class="btn" id="submitBtn">Cevabı Kontrol Et</button>
+<button class="btn secondary" id="skipBtn">Pas Geç</button>
+</div>
+<div class="stats">Doğru: <strong id="okCount">0</strong> · Yanlış: <strong id="failCount">0</strong> · Seri: <strong id="streak">0</strong></div>
+</section>
+</main>
+</div>
 
-  <script>
-    const MOODS=[
-      {key:'very_sad',label:'Çok üzgün',emoji:'😭'},
-      {key:'sad',label:'Üzgün',emoji:'☹️'},
-      {key:'neutral',label:'Neutral',emoji:'😐'},
-      {key:'happy',label:'Mutlu',emoji:'🙂'},
-      {key:'very_happy',label:'Çok mutlu',emoji:'😄'}
-    ];
-    const state={name:'Naz',moodIndex:2,ok:0,fail:0,streak:0,difficulty:1,current:null};
 
-    let audioCtx;function beep(type='good'){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);const good=type==='good';o.type=good?'triangle':'square';o.frequency.value=good?880:240;g.gain.value=.0001;const t=audioCtx.currentTime;g.gain.exponentialRampToValueAtTime(good?.12:.08,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+.25);o.start();o.stop(t+.26)}catch(e){}}
+<script>
+const MOODS=[
+{key:'very_sad',label:'Çok üzgün',emoji:'😭'},
+{key:'sad',label:'Üzgün',emoji:'☹️'},
+{key:'neutral',label:'Neutral',emoji:'😐'},
+{key:'happy',label:'Mutlu',emoji:'🙂'},
+{key:'very_happy',label:'Çok mutlu',emoji:'😄'}
+];
+const state={name:'Naz',moodIndex:2,ok:0,fail:0,streak:0,difficulty:1,current:null};
 
-    const avatarEl=document.getElementById('avatar');
-    const moodLabelEl=document.getElementById('moodLabel');
-    const questionEl=document.getElementById('question');
-    const answerInput=document.getElementById('answerInput');
-    const submitBtn=document.getElementById('submitBtn');
-    const skipBtn=document.getElementById('skipBtn');
-    const okCountEl=document.getElementById('okCount');
-    const failCountEl=document.getElementById('failCount');
-    const streakEl=document.getElementById('streak');
 
-    function moodImagePath(){const key=MOODS[state.moodIndex].key;return `/images/${key}.jpg`;}
-    function renderMood(){document.body.setAttribute('data-mood',MOODS[state.moodIndex].key);avatarEl.innerHTML='';const img=new Image();img.src=moodImagePath();img.alt=state.name;img.onload=()=>{avatarEl.appendChild(img)};img.onerror=()=>{avatarEl.innerHTML=`<span>${MOODS[state.moodIndex].emoji}</span>`};moodLabelEl.textContent=MOODS[state.moodIndex].label;}
+let audioCtx;function beep(type='good'){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);const good=type==='good';o.type=good?'triangle':'square';o.frequency.value=good?880:240;g.gain.value=.0001;const t=audioCtx.currentTime;g.gain.exponentialRampToValueAtTime(good?.12:.08,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+.25);o.start();o.stop(t+.26)}catch(e){}}
 
-    function setDifficultyByStreak(){const s=state.streak;state.difficulty=s>=8?3:s>=3?2:1;}
-    function rng(min,max){return Math.floor(Math.random()*(max-min+1))+min}
-    function newQuestion(){setDifficultyByStreak();let range=state.difficulty===1?10:state.difficulty===2?25:60;let a=rng(0,range),b=rng(0,range);const op=Math.random()<.5?'+':'-';if(op==='-'&&b>a)[a,b]=[b,a];state.current={a,b,op,answer:op==='+'?a+b:a-b};questionEl.innerHTML=`<div>${a}</div><div>${op}</div><div>${b}</div><div>=</div>`;answerInput.value='';setTimeout(()=>answerInput.focus(),0)}
-    function applyResult(ok){if(ok){state.ok++;state.streak++;state.moodIndex=Math.min(MOODS.length-1,state.moodIndex+1);beep('good')}else{state.fail++;state.streak=0;state.moodIndex=Math.max(0,state.moodIndex-1);beep('bad')}okCountEl.textContent=state.ok;failCountEl.textContent=state.fail;streakEl.textContent=state.streak;renderMood()}
-    function handleSubmit(){const val=Number((answerInput.value||'').trim());if(Number.isNaN(val)){answerInput.focus();return}const ok=(val===state.current.answer);answerInput.style.outline=`2px solid ${ok?'var(--good)':'var(--bad)'}`;setTimeout(()=>answerInput.style.outline='none',180);applyResult(ok);newQuestion()}
 
-    submitBtn.addEventListener('click',handleSubmit);skipBtn.addEventListener('click',()=>newQuestion());document.addEventListener('keydown',e=>{if(e.key==='Enter')handleSubmit()});
-    renderMood();newQuestion();
-  </script>
-</body>
-</html>
+const avatarEl=document.getElementById('avatar');
+const moodLabelEl=document.getElementById('moodLabel');
+const questionEl=document.getElementById('question');
+const answerInput=document.getElementById('answerInput');
+const submitBtn=document.getElementById('submitBtn');
+const skipBtn=document.getElementById('skipBtn');
+const okCountEl=document.getElementById('okCount');
+const failCountEl=document.getElementById('failCount');
+const streakEl=document.getElementById('streak');
+
+
+function moodImagePath(){
+const key = MOODS[state.moodIndex].key;
