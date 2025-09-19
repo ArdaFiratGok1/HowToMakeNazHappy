@@ -71,8 +71,47 @@
     transform: translateX(6px);
   }
 }
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 19, 34, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.end-game-card {
+  background: var(--panel);
+  padding: 30px 40px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  display: grid;
+  gap: 15px;
+  max-width: 400px;
+}
+
+.end-game-card h2 {
+  margin: 0;
+  font-size: 32px;
+  color: var(--ink);
+}
+
+.end-game-card p {
+  margin: 0;
+  color: #555;
+  font-size: 18px;
+}
+
   </style>
 </head>
+
 <body data-mood="neutral">
   <div class="wrap">
     <aside>
@@ -105,9 +144,23 @@
       {key:'mutlu2',label:'YİNE DOĞRU CEVAP 😄 ',emoji:'😄'},
       {key:'mutlu3',label:'🥳🥳🥳',emoji:'😄'}
     ];
-    const state={name:'Naz',moodIndex:3,ok:0,fail:0,streak:0,difficulty:1,current:null};
+    const state={
+    name:'Naz', moodIndex:3, ok:0, fail:0, streak:0, 
+    difficulty:1, current:null, 
+    winStreak: 0, // YENİ: Kazanma serisi sayacı
+    loseStreak: 0 // YENİ: Kaybetme serisi sayacı
+};
 
-    let audioCtx;function beep(type='good'){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);const good=type==='good';o.type=good?'triangle':'square';o.frequency.value=good?880:240;g.gain.value=.0001;const t=audioCtx.currentTime;g.gain.exponentialRampToValueAtTime(good?.12:.08,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+.25);o.start();o.stop(t+.26)}catch(e){}}
+// YENİ: 5 farklı ses efektini tanımla
+const sounds = {
+    correct: new Audio('sounds/correct.mp3'),
+    wrong: new Audio('sounds/wrong.mp3'),
+    win: new Audio('sounds/win.mp3'),
+    lose: new Audio('sounds/lose.mp3'),
+    neutral: new Audio('sounds/neutral.mp3')
+};
+
+    let audioCtx;function beep(type='good'){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);const good=type==='good';o.type=good?'triangle':'square';o.frequency.value=good?880:240;g.gain.value=.0001;const t=audioCtx.currentTime;g.gain.exponentialRampToValueAtTime(good?0.12:.08,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+.25);o.start();o.stop(t+.26)}catch(e){}}
 
     const avatarEl=document.getElementById('avatar');
     const moodLabelEl=document.getElementById('moodLabel');
@@ -138,7 +191,54 @@
       img.onerror=()=>{avatarEl.innerHTML=`<span>${MOODS[state.moodIndex].emoji}</span>`};
       moodLabelEl.textContent=MOODS[state.moodIndex].label;
     }
-    // Bu yardımcı fonksiyonu da script'e ekleyin (örn: renderMood'un altına)
+    function playSound(soundKey) {
+    try {
+        const sound = sounds[soundKey];
+        if (sound) {
+            sound.currentTime = 0;
+            sound.play();
+        }
+    } catch (e) { console.error(`${soundKey} sesi çalınamadı.`, e); }
+}
+
+// YENİ: Oyunu bitiren fonksiyon
+function endGame(isWin) {
+    const overlay = document.getElementById('endGameOverlay');
+    const title = document.getElementById('endGameTitle');
+    const message = document.getElementById('endGameMessage');
+
+    if (isWin) {
+        title.textContent = '🥳 KAZANDIN! 🥳';
+        message.textContent = `Tebrikler! Naz'ı çok mutlu ettin ve oyunu tamamladın!`;
+        playSound('win');
+    } else {
+        title.textContent = '😥 KAYBETTİN! 😥';
+        message.textContent = `Naz'ı çok üzdün. Bu sefer olmadı, ama pes etme!`;
+        playSound('lose');
+    }
+    overlay.style.display = 'flex';
+}
+
+// YENİ: Oyunu yeniden başlatan fonksiyon
+function restartGame() {
+    const overlay = document.getElementById('endGameOverlay');
+    overlay.style.display = 'none';
+
+    // State'i sıfırla
+    Object.assign(state, {
+        moodIndex:3, ok:0, fail:0, streak:0, 
+        winStreak: 0, loseStreak: 0
+    });
+    
+    // Arayüzü güncelle
+    okCountEl.textContent = state.ok;
+    failCountEl.textContent = state.fail;
+    streakEl.textContent = state.streak;
+
+    renderMood();
+    newQuestion();
+    playSound('neutral');
+}
 function triggerAnimation(animationClass) {
   avatarEl.classList.add(animationClass);
   // Animasyon bitince sınıfı temizle ki tekrar tetiklenebilsin
@@ -152,48 +252,71 @@ function triggerAnimation(animationClass) {
     function newQuestion(){setDifficultyByStreak();let range=state.difficulty===1?10:state.difficulty===2?25:60;let a=rng(0,range),b=rng(0,range);const op=Math.random()<.5?'+':'-';if(op==='-'&&b>a)[a,b]=[b,a];state.current={a,b,op,answer:op==='+'?a+b:a-b};questionEl.innerHTML=`<div>${a}</div><div>${op}</div><div>${b}</div><div>=</div>`;answerInput.value='';setTimeout(()=>answerInput.focus(),0)}
     
     function applyResult(ok) {
-  const moodBefore = state.moodIndex; // Ruh hali değişmeden önceki indeksi al
-  const maxMoodIndex = MOODS.length - 1;
+    const moodBefore = state.moodIndex;
+    const maxMoodIndex = MOODS.length - 1;
 
-  // Normal skor ve ruh hali güncelleme mantığı
-  if (ok) {
-    state.ok++;
-    state.streak++;
-    state.moodIndex = Math.min(maxMoodIndex, state.moodIndex + 1);
-    beep('good');
-  } else {
-    state.fail++;
-    state.streak = 0;
-    state.moodIndex = Math.max(0, state.moodIndex - 1);
-    beep('bad');
-  }
+    if (ok) {
+        state.ok++; state.streak++; state.moodIndex = Math.min(maxMoodIndex, state.moodIndex + 1); state.loseStreak = 0;
+        if (moodBefore === maxMoodIndex) { state.winStreak++; }
+        if (state.winStreak >= 3) { endGame(true); return true; } // Oyun bitti
+        playSound('correct');
+    } else {
+        state.fail++; state.streak = 0; state.moodIndex = Math.max(0, state.moodIndex - 1); state.winStreak = 0;
+        if (moodBefore === 0) { state.loseStreak++; }
+        if (state.loseStreak >= 3) { endGame(false); return true; } // Oyun bitti
+        playSound('wrong');
+    }
 
-  // Animasyonları kontrol et
-  if (ok && moodBefore === maxMoodIndex) {
-    // Zaten en mutluydun ve yine doğru bildin -> Zıpla!
-    triggerAnimation('avatar-jump');
-  } else if (!ok && moodBefore === 0) {
-    // Zaten en üzgündün ve yine yanlış bildin -> Titre!
-    triggerAnimation('avatar-shake');
-  }
+    if (ok && moodBefore === maxMoodIndex) { triggerAnimation('avatar-jump'); } 
+    else if (!ok && moodBefore === 0) { triggerAnimation('avatar-shake'); }
   
-  okCountEl.textContent = state.ok;
-  failCountEl.textContent = state.fail;
-  streakEl.textContent = state.streak;
-  renderMood();
+    okCountEl.textContent = state.ok;
+    failCountEl.textContent = state.fail;
+    streakEl.textContent = state.streak;
+    renderMood();
+    return false; // Oyun devam ediyor
 }
 
 
 
 
-    function handleSubmit(){const val=Number((answerInput.value||'').trim());if(Number.isNaN(val)){answerInput.focus();return}const ok=(val===state.current.answer);answerInput.style.outline=`2px solid ${ok?'var(--good)':'var(--bad)'}`;setTimeout(()=>answerInput.style.outline='none',180);applyResult(ok);newQuestion()}
+    function handleSubmit() {
+    const val = Number((answerInput.value || '').trim());
+    if (Number.isNaN(val)) { answerInput.focus(); return }
+    const ok = (val === state.current.answer);
+    answerInput.style.outline = `2px solid ${ok ? 'var(--good)' : 'var(--bad)'}`;
+    setTimeout(() => answerInput.style.outline = 'none', 180);
+    
+    const isGameOver = applyResult(ok); // applyResult'tan dönen değeri al
+    if (!isGameOver) { // Sadece oyun bitmediyse yeni soru getir
+        newQuestion();
+    }
+}
+    // ESKİ event listener kodları
+document.addEventListener('DOMContentLoaded', () => {
+  // Event listeners
+  submitBtn.addEventListener('click', handleSubmit);
+  skipBtn.addEventListener('click', () => newQuestion());
+  answerInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleSubmit() });
 
-    submitBtn.addEventListener('click',handleSubmit);
-    skipBtn.addEventListener('click',()=>newQuestion());
-    answerInput.addEventListener('keydown',e=>{if(e.key==='Enter')handleSubmit()});
-    preloadImages();
-    renderMood();
-    newQuestion();
+  const restartBtn = document.getElementById('restartBtn');
+  if (restartBtn) restartBtn.addEventListener('click', restartGame);
+
+  // Başlangıç
+  preloadImages();
+  renderMood();
+  newQuestion();      // Artık ilk soru yüklenir
+  playSound('neutral');
+});
   </script>
+
+<div class="overlay" id="endGameOverlay" style="display: none;">
+  <div class="end-game-card">
+    <h2 id="endGameTitle"></h2>
+    <p id="endGameMessage"></p>
+    <button class="btn" id="restartBtn">Tekrar Başla</button>
+  </div>
+</div>
+
 </body>
 </html>
